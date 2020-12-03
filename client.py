@@ -1,7 +1,6 @@
 from ctypes import *
 from urllib.parse import urlparse, urlencode
 import ujson
-import re
 lib = cdll.LoadLibrary("./main.so")
 
 class GoString(Structure):
