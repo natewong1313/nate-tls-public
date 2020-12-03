@@ -148,7 +148,6 @@ class CookieJar(object):
         if cookies_list != None:
             for cookie in cookies_list:
                 self.__add_new_cookie(cookie)
-                # cookie = {'name': 'dsg_perf_analysis', 'value': 'UB-3', 'domain': 'www.dickssportinggoods.com', 'path': '/'}
     
     def clear(self):
         self.cookies = []
@@ -156,7 +155,7 @@ class CookieJar(object):
     def get(self, name, domain = None, path = None):
         for cookie in self.cookies:
             if cookie.name == name and (cookie.domain == domain if domain else True):
-                return f"{cookie.name}={cookie.value}"
+                return cookie.value
         raise ValueError(f"Cookie with name {cookie.name} not found")
     
     def get_dict(self):
@@ -203,7 +202,7 @@ class Response(object):
             raise ValueError("Body is not of type JSON") 
     
     def handle_error(self, error):
-        if "EOF" in error:
+        if "EOF" in error or "dial tcp: lookup " in error and "no such host" in error:
             raise ConnectionError("Failed to connect to host")
         elif "No connection could be made because the target machine actively refused it" in error:
             raise ProxyError("Failed to connect to proxy/host")
@@ -211,10 +210,10 @@ class Response(object):
             raise ProxyError("Proxy TLS error")
         elif "407 Proxy Authentication Required" in error:
             raise ProxyError("Invalid proxy username or password")
-        elif "dial tcp: lookup " in error and "no such host" in error:
-            raise ProxyError("Invalid proxy ip address")
         elif "http: server gave HTTP response to HTTPS client" in error:
             raise ProxyError("Invalid proxy format (HTTPS error)")
+        elif "502 Proxy Error" in error:
+            raise ProxyError("Proxy connection busy")
         elif "503 Error" in error or "timeout" in error or "connected host has failed to respond" in error:
             raise TimeoutError("Connection timed out")
         else:

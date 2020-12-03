@@ -1644,16 +1644,6 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 		}
 	}
 
-	if req.Header.Get("cookie") != "" {
-		cookies := strings.Split(req.Header.Get("cookie"), ";")
-		for _, cookieVal := range cookies {
-			cc.writeHeader("cookie", cookieVal)
-			if traceHeaders {
-				traceWroteHeaderField(trace, "cookie", cookieVal)
-			}
-		}
-	}
-
 	return cc.hbuf.Bytes(), nil
 }
 
