@@ -1,7 +1,9 @@
 from ctypes import *
 from urllib.parse import urlparse, urlencode
 import ujson
-lib = cdll.LoadLibrary("./main.so")
+import os
+
+lib = cdll.LoadLibrary("./main.so") if os.name == "nt" else cdll.LoadLibrary("./main-mac.so")
 
 class GoString(Structure):
     _fields_ = [("p", c_char_p), ("n", c_longlong)]
