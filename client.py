@@ -152,6 +152,12 @@ class CookieJar(object):
     def clear(self):
         self.cookies = []
     
+    def delete(self, cookie_name):
+        cookies_copy = self.cookies
+        for cookie in cookies_copy:
+            if cookie.name == cookie_name:
+                self.cookies.remove(cookie)
+    
     def get(self, name, domain = None, path = None):
         for cookie in self.cookies:
             if cookie.name == name and (cookie.domain == domain if domain else True):

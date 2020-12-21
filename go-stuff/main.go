@@ -68,7 +68,11 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 			line = strings.TrimSpace(line)
 			if line != "" {
 				dataSplit := strings.Split(line, ": ")
-				form.Add(dataSplit[0], dataSplit[1])
+				if len(dataSplit) == 2 {
+					form.Add(dataSplit[0], dataSplit[1])
+				} else {
+					form.Add(line[:len(line)-1], "")
+				}
 			}
 		}
 		req, err = http.NewRequest(reqType, reqUrl, strings.NewReader(form.Encode()))
@@ -89,7 +93,7 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 			if len(headerSplit) == 2 {
 				req.Header.Add(headerSplit[0], headerSplit[1])
 			} else {
-				req.Header.Add(strings.Split(line, ":")[0], "")
+				req.Header.Add(line[:len(line)-1], "")
 			}
 		}
 	}
@@ -107,8 +111,16 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 	default:
 		reader = resp.Body
 	}
+	if err != nil {
+		stringData, _ := json.Marshal(Response{err.Error(), reqUrl, "", respHeaders, respCookies, 0})
+		return C.CString(string(stringData))
+	}
 
 	bodyBytes, err := ioutil.ReadAll(reader)
+	if err != nil {
+		stringData, _ := json.Marshal(Response{err.Error(), reqUrl, "", respHeaders, respCookies, 0})
+		return C.CString(string(stringData))
+	}
 	resp.Body.Close()
 	reader.Close()
 	respBody := string(bodyBytes)
@@ -122,7 +134,11 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 			}
 		}
 	}
-	domainURL, _ := url.Parse(resp.Request.URL.String())
+	domainURL, err := url.Parse(resp.Request.URL.String())
+	if err != nil {
+		stringData, _ := json.Marshal(Response{err.Error(), reqUrl, "", respHeaders, respCookies, 0})
+		return C.CString(string(stringData))
+	}
 	for _, cookie := range resp.Cookies() {
 		domain := cookie.Domain
 		if domain == "" {
@@ -131,7 +147,11 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 		respCookies = append(respCookies, Cookie{cookie.Name, cookie.Value, domain, cookie.Path})
 	}
 
-	stringData, _ := json.Marshal(Response{"", resp.Request.URL.String(), respBody, respHeaders, respCookies, resp.StatusCode})
+	stringData, err := json.Marshal(Response{"", resp.Request.URL.String(), respBody, respHeaders, respCookies, resp.StatusCode})
+	if err != nil {
+		stringData, _ := json.Marshal(Response{err.Error(), reqUrl, "", respHeaders, respCookies, 0})
+		return C.CString(string(stringData))
+	}
 	return C.CString(string(stringData))
 }
 
