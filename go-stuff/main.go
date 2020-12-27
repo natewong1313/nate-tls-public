@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"github.com/natewong1313/client/cclient"
 	"github.com/natewong1313/client/http"
-	"github.com/refraction-networking/utls"
+	"github.com/natewong1313/client/utls"
 	"io"
 	"io/ioutil"
 	"net/url"

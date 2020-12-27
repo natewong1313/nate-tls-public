@@ -13,7 +13,7 @@ import (
 	"github.com/natewong1313/client/http2"
 	"golang.org/x/net/proxy"
 
-	utls "github.com/refraction-networking/utls"
+	utls "github.com/natewong1313/client/utls"
 )
 
 var errProtocolNegotiated = errors.New("protocol negotiated")

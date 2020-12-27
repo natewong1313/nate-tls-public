@@ -2,7 +2,7 @@ package cclient
 
 import (
 	"github.com/natewong1313/client/http"
-	utls "github.com/refraction-networking/utls"
+	utls "github.com/natewong1313/client/utls"
 	"golang.org/x/net/proxy"
 	"strings"
 )
