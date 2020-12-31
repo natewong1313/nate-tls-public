@@ -139,7 +139,7 @@ func MakeReq(reqUrl, reqType, clientHello, headers, data, dataType, proxy string
 		stringData, _ := json.Marshal(Response{err.Error(), reqUrl, "", respHeaders, respCookies, 0})
 		return C.CString(string(stringData))
 	}
-	for _, cookie := range resp.Cookies() {
+	for _, cookie := range client.Jar.Cookies(domainURL) {
 		domain := cookie.Domain
 		if domain == "" {
 			domain = domainURL.Host
